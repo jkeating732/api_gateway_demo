@@ -3,7 +3,12 @@ Description: Outputs the time
 Resources:
   TimeFunction:
     Properties:
-      CodeUri: s3://api-gateway-demo-jkeating/1dc3b26f7932a0cfa75f2d5cba936be7
+      Alarms:
+      - Ref: AliasErrorMetricGreaterThanZeroAlarm
+      - Ref: LatestVersionErrorMetricGreaterThanZeroAlarm
+      AutoPublishAlias: live
+      CodeUri: s3://api-gateway-demo-jkeating/428c2b4fa6d8d9d7fcc1535eab4f7a87
+      DeploymentPreference: null
       Events:
         MyTimeApi:
           Properties:
@@ -11,6 +16,12 @@ Resources:
             Path: /TimeResource
           Type: Api
       Handler: index.handler
+      Hooks:
+        PostTraffic:
+          Ref: PostTrafficLambdaFunction
+        PreTraffic:
+          Ref: PreTrafficLambdaFunction
       Runtime: nodejs6.10
+      Type: Canary10Percent10Minutes
     Type: AWS::Serverless::Function
 Transform: AWS::Serverless-2016-10-31
