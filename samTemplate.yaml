@@ -5,6 +5,7 @@ Resources:
   TimeFunction:
     Type: AWS::Serverless::Function
     Properties:
+      AutoPublishAlias: live
       Handler: index.handler
       Runtime: nodejs6.10
       CodeUri: ./
@@ -14,3 +15,13 @@ Resources:
           Properties:
             Path: /TimeResource
             Method: GET
+      DeploymentPreference:
+      Type: Canary10Percent10Minutes 
+      Alarms:
+        # A list of alarms that you want to monitor
+        - !Ref AliasErrorMetricGreaterThanZeroAlarm
+        - !Ref LatestVersionErrorMetricGreaterThanZeroAlarm
+      Hooks:
+        # Validation Lambda functions that are run before & after traffic shifting
+        PreTraffic: !Ref PreTrafficLambdaFunction
+        PostTraffic: !Ref PostTrafficLambdaFunction
